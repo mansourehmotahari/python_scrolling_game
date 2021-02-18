@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 from pygame.locals import (
     RLEACCEL,
@@ -106,6 +107,9 @@ pygame.time.set_timer(ADDENEMY, 500)
 ADDCLOUD = pygame.USEREVENT + 2
 pygame.time.set_timer(ADDCLOUD, 1000)
 
+add_score = pygame.USEREVENT + 3
+pygame.time.set_timer(add_score, 1000)
+
 player = Player()
 
 enemies = pygame.sprite.Group()
@@ -114,6 +118,7 @@ all_sprites.add(player)
 clouds = pygame.sprite.Group()
 
 running = True
+score = 0
 
 clock = pygame.time.Clock()
 
@@ -123,8 +128,8 @@ pygame.mixer.music.play(loops=-1)
 
 
 move_sound = pygame.mixer.Sound("0.wav")
-collision_sound = pygame.mixer.Sound("c.mp3")
-
+#collision_sound = pygame.mixer.Sound("c.mp3")
+font = pygame.font.SysFont("Times", 14)
 
 while running:
     for event in pygame.event.get():
@@ -136,6 +141,9 @@ while running:
 
         elif event.type == QUIT:
             running = False
+
+        elif event.type == add_score:
+            score += 5
 
         # Add a new enemy?
         elif event.type == ADDENEMY:
@@ -161,12 +169,19 @@ while running:
     # Draw all sprites
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
+    scoreboard = "Score: " + str(score)
+    text = font.render(scoreboard, True, (255, 255, 255))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx
+    text_rect.y = 20
+    screen.blit(text, text_rect)
 
     if pygame.sprite.spritecollideany(player, enemies):
         player.kill()
 
         move_sound.stop()
-        collision_sound.play()
+        #collision_sound.play()
+        #time.sleep(5)
 
         running = False
 
